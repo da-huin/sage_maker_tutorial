@@ -1,0 +1,3 @@
+src/mnist.pkl.gz
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
