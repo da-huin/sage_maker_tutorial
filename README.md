@@ -61,10 +61,12 @@ Full Code is in `src/tutorial.ipynb`
 
 1. Upgrade sagemaker version to use `sagemaker.image_uris.retrieve`
 
+    * Tested sagemaker version is 2.3.0
+
     ```bash
     !pip uninstall sagemaker -y && pip install sagemaker
-    sagemaker.__version__
     ```
+
 
 1. To download dataset, copy and paste the following code into the notebook and run it.
 
@@ -249,7 +251,7 @@ Full Code is in `src/tutorial.ipynb`
             2020-08-16 01:08:11 Uploading - Uploading generated training model
             2020-08-16 01:08:11 Completed - Training job completed
             Training seconds: 140
-            Billable seconds: 140        
+            Billable seconds: 140
 
 1. You can check your training in [Sagemaker Console.](https://console.aws.amazon.com/sagemaker/)
 
@@ -259,7 +261,8 @@ Full Code is in `src/tutorial.ipynb`
 
     ![training_3.png](./static/training_3.png)
 
-#### **6. Deploy the Model to Amazon SageMaker**
+
+#### **6. Deploy and Validation the Model**
 
 To get predictions, deploy your model. The method you use depends on how you want to generate inferences:
 
@@ -268,7 +271,147 @@ To get predictions, deploy your model. The method you use depends on how you wan
   2. To get inferences for an entire dataset, use Amazon SageMaker batch transform.
 
 
+##### Hosting services
+1. Deploy the Model to SageMaker Hosting Services
 
+    ```python
+    xgb_predictor = xgb_model.deploy(initial_instance_count=1,
+                                    serializer=sagemaker.serializers.CSVSerializer(),
+                                    instance_type='ml.t2.medium')
+    ```
+
+1. You can check in SageMaker Console at https://console.aws.amazon.com/sagemaker/
+
+    ![](./static/inference_and_endpoint.png)
+
+1. Download test data from S3
+
+    ```python
+    test_key = f"{prefix}/test/examples"
+    s3_client.download_file(Bucket=bucket, Key=test_key, Filename="test_data")
+    ```
+
+1. Plot the first 10 images from the dataset with their labels.
+
+    ```python
+    %matplotlib inline
+    fig, axes = plt.subplots(nrows=1, ncols=10, figsize=(10, 10))
+
+    for i in range(0, 10):
+        img = test_set[0][i]
+        label = test_set[1][i]
+        img_reshape = img.reshape((28,28))
+        ax = axes[i]
+        imgplot = ax.imshow(img_reshape, cmap='gray')
+        ax.axis("off")
+        ax.set_title(label)
+
+    plt.show()  
+    ```
+
+    ![test_numbers](./static/test_numbers.png)
+
+1. call the predict method
+
+    ```python
+    with open('test_data', 'r') as f:
+        for j in range(0,10):
+            single_test = f.readline()
+            result = xgb_predictor.predict(single_test)
+            print(int(float(result.decode())), end=" ")
+    ```
+
+    * result:
+        ```python
+        7 2 1 0 4 1 4 9 5 9 
+        ```
+
+
+##### Batch Transform
+
+1. Paste the following code and run the cell.
+
+    ```python
+    # The location of the test dataset
+    batch_input = f"s3://{bucket}/{prefix}/test/examples"
+    # The location to store the results of the batch transform job
+    batch_output = f"s3://{bucket}/{prefix}/batch-inference"
+
+    transformer = xgb_model.transformer(instance_count=1, instance_type='ml.m4.xlarge', output_path=batch_output)
+
+    transformer.transform(data=batch_input, data_type='S3Prefix', content_type='text/csv', split_type='Line')
+
+    transformer.wait()
+    ```
+
+1. Download the output from the batch transform job.
+
+    ```python
+    test_key = f"{prefix}/batch-inference/examples.out"
+    s3_client.download_file(Bucket=bucket, Key=test_key, Filename="batch_results")
+    ```
+
+1. Get the first 50 results from the batch transform job.
+
+    ```python
+    with open('batch_results') as f:
+        results = f.readlines()
+    for j in range (0, 50):
+        print(int(float(results[j])), end=" ")
+    ```
+
+    * result:
+      ```python
+      7 2 1 0 4 1 4 9 5 9 0 6 9 0 1 5 9 7 3 4 9 6 6 5 4 0 7 4 0 1 3 1 3 4 7 2 7 1 2 1 1 7 4 2 3 5 1 2 4 4 
+      ```
+
+#### **7. Intergrating SageMaker Endpoints into Applications**
+
+1. get endpoint name in SageMaker Console
+  
+    ![](./static/endpoint_name.png)
+
+1. Paste and Run the following code.
+
+    ```python
+    import boto3
+    import os
+    import io
+    import boto3
+    import json
+    import csv
+
+    ENDPOINT_NAME = "xgboost-2020-08-16-06-47-01-579" # Your Endpoint Name
+    runtime = boto3.client('runtime.sagemaker')
+
+    with open('test_data', 'r') as f:
+        for j in range(0,50):
+            payload = f.readline()
+            response = runtime.invoke_endpoint(EndpointName=ENDPOINT_NAME,
+                                              ContentType='text/csv',
+                                              Body=payload)
+            
+            result = json.loads(response["Body"].read().decode())
+            
+
+            print(int(float(result)), end=" ")
+    ```
+
+    * result
+
+        ```python
+        7 2 1 0 4 1 4 9 5 9 0 6 9 0 1 5 9 7 3 4 9 6 6 5 4 0 7 4 0 1 3 1 3 4 7 2 7 1 2 1 1 7 4 2 3 5 1 2 4 4 
+        ```
+
+1. If you want use Lambda Function, refer to following URL.
+
+    * https://aws.amazon.com/ko/blogs/machine-learning/call-an-amazon-sagemaker-model-endpoint-using-amazon-api-gateway-and-aws-lambda/
+
+#### **8. Clean Up**
+
+Clean up in Sagemaker Console at https://console.aws.amazon.com/sagemaker/
+
+Clean up in S3 Console at https://s3.console.aws.amazon.com/s3/
 
 ## 🎉 Acknowledgements <a name = "acknowledgement"></a>
 
