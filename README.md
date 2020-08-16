@@ -20,7 +20,7 @@
 ---
 
 <p align="center"> 
-    <br> ✨ This project is summary of [AWS SageMaker Get Started] and updated to the latest version.
+    <br> ✨ This project is a summary of [Getting Started with AWS SageMaker] and has been updated to the latest version of sagemaker.
 </p>
 
 ## 📝 Table of Contents
