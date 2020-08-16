@@ -409,9 +409,11 @@ To get predictions, deploy your model. The method you use depends on how you wan
 
 #### **8. Clean Up**
 
-Clean up in Sagemaker Console at https://console.aws.amazon.com/sagemaker/
+Open the Sagemaker Console at https://console.aws.amazon.com/sagemaker/ and delete `Endpoint`, `Endpoint configurations`, `Models`, `Notebook`.
 
-Clean up in S3 Console at https://s3.console.aws.amazon.com/s3/
+Open the S3 Console at https://s3.console.aws.amazon.com/s3/ and delete `bucket`. 
+
+Open the Amazon CloudWatch console at https://console.aws.amazon.com/cloudwatch/ and delete all of the log groups that have names starting with `/aws/sagemaker/`.
 
 ## 🎉 Acknowledgements <a name = "acknowledgement"></a>
 
