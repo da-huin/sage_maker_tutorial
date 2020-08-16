@@ -2,3 +2,5 @@ src/mnist.pkl.gz
 .ipynb_checkpoints
 */.ipynb_checkpoints/*
 src/data.csv
+src/batch_results
+src/test_data
