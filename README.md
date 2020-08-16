@@ -10,8 +10,8 @@
 <div align="center">
 
 [![Status](https://img.shields.io/badge/status-active-success.svg)]()
-[![GitHub Issues](https://img.shields.io/github/issues/da-huin/sage_maker_tutorial.svg)](https://github.com/da-huin/sage_maker_tutorial/issues)
-[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/da-huin/sage_maker_tutorial.svg)](https://github.com/da-huin/sage_maker_tutorial/pulls)
+[![GitHub Issues](https://img.shields.io/github/issues/da-huin/sagemaker_tutorial.svg)](https://github.com/da-huin/sagemaker_tutorial/issues)
+[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/da-huin/sagemaker_tutorial.svg)](https://github.com/da-huin/sagemaker_tutorial/pulls)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](/LICENSE)
 
 
@@ -419,7 +419,7 @@ Open the Amazon CloudWatch console at https://console.aws.amazon.com/cloudwatch/
 
 - Title icon made by [Freepik](https://www.flaticon.com/kr/authors/freepik).
 
-- If you have a problem. please make [issue](https://github.com/da-huin/sage_maker_tutorial/issues).
+- If you have a problem. please make [issue](https://github.com/da-huin/sagemaker_tutorial/issues).
 
 - Please help develop this project 😀
 
